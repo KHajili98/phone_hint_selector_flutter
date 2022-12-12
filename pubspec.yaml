@@ -30,7 +30,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
-  smart_auth: ^1.0.5
+  phoneselectorhint: ^0.0.9
+
 
 dev_dependencies:
   # The "flutter_lints" package below contains a set of recommended lints to

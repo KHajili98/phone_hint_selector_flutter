@@ -121,6 +121,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.1"
+  phoneselectorhint:
+    dependency: "direct main"
+    description:
+      name: phoneselectorhint
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.9"
   sky_engine:
     dependency: transitive
     description: flutter

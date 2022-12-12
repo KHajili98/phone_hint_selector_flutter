@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:smart_auth/smart_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:phoneselectorhint/phoneselectorhint.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -9,6 +13,7 @@ class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
+
   State<MyApp> createState() => _MyAppState();
 }
 
@@ -23,39 +28,84 @@ class _MyAppState extends State<MyApp> {
     requestHint();
   }
 
+
+
+class _MyHomePageState extends State<MyHomePage> {
+  String _platformVersion = 'Unknown';
+  String _hint = '';
   @override
-  void dispose() {
-    smartAuth.removeSmsListener();
-    pinputController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    initPlatformState();
   }
 
-  void getAppSignature() async {
-    final res = await smartAuth.getAppSignature();
-    debugPrint('Signature: $res');
-  }
+  String? hint;
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    String platformVersion;
 
-  void requestHint() async {
-    final res = await smartAuth.requestHint(
-      isPhoneNumberIdentifierSupported: true,
-      // isEmailAddressIdentifierSupported: true,
-      showCancelButton: true,
-    );
-    debugPrint('requestHint: $res');
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      platformVersion = await Phoneselectorhint.platformVersion ?? 'Unknown platform version';
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _platformVersion = platformVersion;
+      hint = _hint;
+    });
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(onPressed: requestHint, child: const Text('Request Hint')),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Phone Selector Hint'),
+        actions: const [],
       ),
+      persistentFooterButtons: const [
+        Text(
+          "Done by Gobal Krishnan V, Flutter Developer & Engineer",
+          style: TextStyle(fontSize: 8),
+        )
+      ],
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text("Note: Click on the Hint button to pick mobile number"),
+          Center(
+            child: Text(
+              'Mobile : $hint\n',
+              style: const TextStyle(fontSize: 23),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          if (Platform.isAndroid) {
+            try {
+              _hint = await Phoneselectorhint.hint ?? '';
+              setState(() {
+                hint = _hint;
+              });
+              print("phne - $_hint");
+            } on PlatformException {
+              _hint = 'phone number is not working';
+            }
+          } else {}
+        },
+        child: const Text("Hint"),
+      ),
+
     );
   }
 }
