@@ -4,32 +4,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:phoneselectorhint/phoneselectorhint.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Phone hint Selector'),
-    );
-  }
+
+  State<MyApp> createState() => _MyAppState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+class _MyAppState extends State<MyApp> {
+  final smartAuth = SmartAuth();
+  final pinputController = TextEditingController();
+
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+  void initState() {
+    super.initState();
+    getAppSignature();
+    requestHint();
+  }
+
+
 
 class _MyHomePageState extends State<MyHomePage> {
   String _platformVersion = 'Unknown';
@@ -62,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _platformVersion = platformVersion;
       hint = _hint;
     });
+
   }
 
   @override
@@ -105,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         child: const Text("Hint"),
       ),
+
     );
   }
 }
