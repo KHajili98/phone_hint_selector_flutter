@@ -4,42 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:phoneselectorhint/phoneselectorhint.dart';
 
-
 void main() {
-  runApp(const MyApp());
+  runApp(const MyHomePage());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
-
-  State<MyApp> createState() => _MyAppState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
-
-class _MyAppState extends State<MyApp> {
-  final smartAuth = SmartAuth();
-  final pinputController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    getAppSignature();
-    requestHint();
-  }
-
-
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _platformVersion = 'Unknown';
-  String _hint = '';
+  String platformVersion = 'Unknown';
+  String hint = '';
   @override
   void initState() {
     super.initState();
-    initPlatformState();
   }
 
-  String? hint;
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
@@ -58,54 +41,54 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!mounted) return;
 
     setState(() {
-      _platformVersion = platformVersion;
-      hint = _hint;
+      platformVersion = platformVersion;
+      hint = hint;
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Phone Selector Hint'),
-        actions: const [],
-      ),
-      persistentFooterButtons: const [
-        Text(
-          "Done by Gobal Krishnan V, Flutter Developer & Engineer",
-          style: TextStyle(fontSize: 8),
-        )
-      ],
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text("Note: Click on the Hint button to pick mobile number"),
-          Center(
-            child: Text(
-              'Mobile : $hint\n',
-              style: const TextStyle(fontSize: 23),
-            ),
-          ),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Phone Selector Hint'),
+          actions: const [],
+        ),
+        persistentFooterButtons: const [
+          Text(
+            "Done by Gobal Krishnan V, Flutter Developer & Engineer",
+            style: TextStyle(fontSize: 8),
+          )
         ],
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Note: Click on the Hint button to pick mobile number"),
+            Center(
+              child: Text(
+                'Mobile : $hint\n',
+                style: const TextStyle(fontSize: 23),
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            if (Platform.isAndroid) {
+              try {
+                hint = await Phoneselectorhint.hint ?? '';
+                setState(() {
+                  hint = hint;
+                });
+                print("phne - $hint");
+              } on PlatformException {
+                hint = 'phone number is not working';
+              }
+            } else {}
+          },
+          child: const Text("Hint"),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (Platform.isAndroid) {
-            try {
-              _hint = await Phoneselectorhint.hint ?? '';
-              setState(() {
-                hint = _hint;
-              });
-              print("phne - $_hint");
-            } on PlatformException {
-              _hint = 'phone number is not working';
-            }
-          } else {}
-        },
-        child: const Text("Hint"),
-      ),
-
     );
   }
-}}
+}
